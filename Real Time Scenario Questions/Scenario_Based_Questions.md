@@ -549,3 +549,79 @@ In AWS EKS, delayed autoscaling can occur if metric collection (e.g., CPU/Memory
 
 - **AWS Autoscaling**: Scales pods based on metrics.
 - **Prometheus/Grafana**: Monitors pod metrics.
+
+  Jenkins Scenario-Based Questions
+Scenario 1: Restarting a Failed Build at a Specific Stage
+
+How can you configure a pipeline to restart from the failed stage instead of starting from the beginning?
+
+Use checkpointing with options { skipStagesAfterUnstable() } or a stage-level restartable flag.
+
+Declarative Example:
+
+pipeline {
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make build'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'make test'
+            }
+        }
+    }
+}
+Scenario 2: Automating Agent Selection for Specific Jobs
+
+Question: How can you ensure that a build runs only on specific agents with certain labels?
+
+Use a label in the agent section.
+
+Example:
+
+pipeline {
+    agent { label 'linux-agent' }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'build.sh'
+            }
+        }
+    }
+}
+Scenario 3: Handling Long-Running Builds with Timeouts
+
+How can you ensure that a pipeline job automatically stops if it takes too long?
+
+Use the timeout step.
+
+Example:
+
+timeout(time: 30, unit: 'MINUTES') {
+    sh 'long_running_task.sh'
+}
+Scenario 4: Securely Managing Credentials in a Pipeline
+
+How can you use credentials stored in Jenkins without exposing them?
+
+Use withCredentials to manage secrets.
+
+Example:
+
+withCredentials([string(credentialsId: 'my-credential-id', variable: 'SECRET_KEY')]) {
+    sh 'echo $SECRET_KEY'
+}
+Scenario 5: Triggering a Downstream Job with Parameters
+
+How do you trigger another Jenkins job and pass parameters to it from a pipeline?
+
+Use build step.
+
+Example:
+
+build job: 'downstream-job', parameters: [string(name: 'BRANCH', value: 'main')]
